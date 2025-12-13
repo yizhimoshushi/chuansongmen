@@ -282,6 +282,23 @@
             margin-top: 10px;
         }
 
+        /* ====== 发布者信息样式 ====== */
+        .creator-info {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-left: 5px;
+            transition: all 0.3s;
+        }
+
+        .creator-info:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
         /* ====== 表单样式 ====== */
         .form-overlay {
             position: fixed;
@@ -741,6 +758,15 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">发布者名称</label>
+                <input type="text" class="form-input" id="portalDisplayName" 
+                       placeholder="例如：神秘魔术师、诡秘学徒等" maxlength="20">
+                <small style="color: var(--purple-medium); font-size: 0.85rem;">
+                    这是别人看到的你的名称（可选，默认显示邮箱）
+                </small>
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">标签 (用逗号分隔)</label>
                 <input type="text" class="form-input" id="portalTags" 
                     placeholder="例如：魔法, 小说, 克苏鲁">
@@ -894,6 +920,19 @@
             }, 5000);
         }
         
+        // ==================== 邮箱脱敏函数 ====================
+        function maskEmail(email) {
+            if (!email || typeof email !== 'string') return '神秘魔术师';
+            
+            const [name, domain] = email.split('@');
+            if (!name || !domain) return email;
+            
+            if (name.length <= 2) {
+                return `${name.charAt(0)}***@${domain}`;
+            }
+            return `${name.charAt(0)}***${name.charAt(name.length - 1)}@${domain}`;
+        }
+        
         // ==================== 认证功能 ====================
         async function login() {
             const email = document.getElementById('loginEmail').value;
@@ -1027,14 +1066,25 @@
                         <a href="${portal.url}" class="portal-url" target="_blank" rel="noopener">
                             <i class="fas fa-external-link-alt"></i> ${portal.url}
                         </a>
+                        
                         ${portal.tags && portal.tags.length > 0 ? `
                             <div class="portal-tags">
                                 ${portal.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
                             </div>
                         ` : ''}
+                        
                         <div class="portal-category">
                             <i class="fas fa-tag"></i> ${portal.category || '未分类'}
                         </div>
+                        
+                        <!-- 发布者信息 -->
+                        <div style="margin-top: 10px; font-size: 0.85rem; color: #a78bfa;">
+                            <i class="fas fa-user-circle"></i> 
+                            <span class="creator-info" title="创建时间: ${new Date(portal.created_at).toLocaleString()}">
+                                发布者: ${portal.display_name || '神秘魔术师'}
+                            </span>
+                        </div>
+                        
                         <div style="margin-top: 15px; font-size: 0.85rem; color: #a78bfa;">
                             <i class="far fa-eye"></i> ${portal.views_count || 0} 浏览 · 
                             <i class="fas fa-mouse-pointer"></i> ${portal.clicks_count || 0} 点击
@@ -1080,6 +1130,8 @@
             const description = document.getElementById('portalDescription').value;
             const category = document.getElementById('portalCategory').value;
             const tagsInput = document.getElementById('portalTags').value;
+            const displayName = document.getElementById('portalDisplayName').value || 
+                               (currentUser ? maskEmail(currentUser.email) : '神秘魔术师');
             
             if (!title || !url) {
                 showMessage('请填写网站名称和地址', 'error');
@@ -1099,7 +1151,8 @@
                         url: url,
                         description: description,
                         category: category,
-                        tags: tags
+                        tags: tags,
+                        display_name: displayName
                     }])
                     .select();
                 
@@ -1113,6 +1166,7 @@
                 document.getElementById('portalUrl').value = '';
                 document.getElementById('portalDescription').value = '';
                 document.getElementById('portalTags').value = '';
+                document.getElementById('portalDisplayName').value = '';
                 
                 // 重新加载传送门列表
                 loadPortals();
