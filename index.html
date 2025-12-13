@@ -437,6 +437,95 @@
             margin-bottom: 15px;
         }
 
+        /* ====== 删除按钮样式 ====== */
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            padding: 8px 15px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s !important;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* ====== 确认对话框样式 ====== */
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 16, 51, 0.9);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .confirm-dialog.active {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .confirm-title {
+            color: #fca5a5;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .confirm-message {
+            color: var(--purple-light);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, var(--purple-medium) 0%, #6d28d9 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -449,6 +538,11 @@
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
         /* ====== 响应式设计 ====== */
@@ -663,19 +757,39 @@
         </div>
     </div>
 
+    <!-- 删除确认对话框 -->
+    <div class="confirm-dialog" id="deleteConfirmDialog">
+        <div class="confirm-box">
+            <h3 class="confirm-title"><i class="fas fa-exclamation-triangle"></i> 确认删除</h3>
+            <p class="confirm-message" id="deleteConfirmMessage">
+                确定要删除这个传送门吗？此操作不可撤销。
+            </p>
+            <div class="confirm-actions">
+                <button class="btn-confirm" onclick="confirmDelete()">
+                    <i class="fas fa-trash-alt"></i> 确认删除
+                </button>
+                <button class="btn-cancel" onclick="cancelDelete()">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 引入 Supabase -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <script>
         // ==================== 配置 ====================
         const SUPABASE_URL = 'https://plakgkehqlopwfrsceem.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWtna2VocWxvcHdmcnNjZWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQyMzQsImV4cCI6MjA4MTE1MDIzNH0.HjlawMHv356F_NaxRagTYR7Q96UnCfAfFLie6XRk1Jg'; // 请替换为你的真实密钥
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWtna2VocWxvcHdmcnNjZWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQyMzQsImV4cCI6MjA4MTE1MDIzNH0.HjlawMHv356F_NaxRagTYR7Q96UnCfAfFLie6XRk1Jg';
         
-        // ==================== 初始化 ====================
+        // ==================== 全局变量 ====================
         let supabase = null;
         let currentUser = null;
+        let deletePortalId = null;
+        let deleteButtonElement = null;
         
-        // 初始化函数
+        // ==================== 初始化 ====================
         async function init() {
             try {
                 // 创建 Supabase 客户端
@@ -901,6 +1015,8 @@
                 
                 // 渲染传送门卡片
                 portals.forEach(portal => {
+                    const isCreator = currentUser && portal.created_by === currentUser.id;
+                    
                     const portalCard = document.createElement('div');
                     portalCard.className = 'portal-card';
                     portalCard.innerHTML = `
@@ -923,6 +1039,12 @@
                             <i class="far fa-eye"></i> ${portal.views_count || 0} 浏览 · 
                             <i class="fas fa-mouse-pointer"></i> ${portal.clicks_count || 0} 点击
                         </div>
+                        
+                        ${isCreator ? `
+                            <button class="btn-delete" onclick="deletePortal('${portal.id}', this)">
+                                <i class="fas fa-trash-alt"></i> 删除传送门
+                            </button>
+                        ` : ''}
                     `;
                     
                     // 点击卡片时增加点击计数
@@ -998,6 +1120,90 @@
             } catch (error) {
                 showMessage(`创建失败: ${error.message}`, 'error');
             }
+        }
+        
+        // ==================== 删除传送门功能 ====================
+        function deletePortal(portalId, buttonElement) {
+            if (!currentUser) {
+                showMessage('请先登录才能删除传送门', 'error');
+                return;
+            }
+            
+            // 保存要删除的传送门ID和按钮元素
+            deletePortalId = portalId;
+            deleteButtonElement = buttonElement;
+            
+            // 查找传送门标题用于显示
+            const portalCard = buttonElement.closest('.portal-card');
+            const portalTitle = portalCard.querySelector('.portal-title').textContent.trim();
+            
+            // 更新确认消息
+            document.getElementById('deleteConfirmMessage').innerHTML = 
+                `确定要删除传送门<br><strong>"${portalTitle}"</strong><br>吗？此操作不可撤销。`;
+            
+            // 显示确认对话框
+            document.getElementById('deleteConfirmDialog').classList.add('active');
+        }
+        
+        function confirmDelete() {
+            if (!deletePortalId) return;
+            
+            // 禁用按钮显示加载状态
+            const confirmBtn = document.querySelector('.btn-confirm');
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 删除中...';
+            confirmBtn.disabled = true;
+            
+            // 执行删除
+            supabase
+                .from('portals')
+                .delete()
+                .eq('id', deletePortalId)
+                .then(async ({ error }) => {
+                    if (error) {
+                        showMessage(`删除失败: ${error.message}`, 'error');
+                    } else {
+                        showMessage('✅ 传送门已成功删除', 'success');
+                        
+                        // 从界面移除卡片
+                        if (deleteButtonElement) {
+                            const portalCard = deleteButtonElement.closest('.portal-card');
+                            portalCard.style.animation = 'fadeOut 0.5s ease';
+                            setTimeout(() => {
+                                portalCard.remove();
+                                updatePortalCount();
+                            }, 500);
+                        }
+                        
+                        // 重新加载列表
+                        setTimeout(loadPortals, 1000);
+                    }
+                    
+                    // 隐藏对话框
+                    cancelDelete();
+                })
+                .catch(error => {
+                    showMessage(`删除失败: ${error.message}`, 'error');
+                    cancelDelete();
+                });
+        }
+        
+        function cancelDelete() {
+            document.getElementById('deleteConfirmDialog').classList.remove('active');
+            deletePortalId = null;
+            deleteButtonElement = null;
+            
+            // 重置确认按钮
+            const confirmBtn = document.querySelector('.btn-confirm');
+            confirmBtn.innerHTML = '<i class="fas fa-trash-alt"></i> 确认删除';
+            confirmBtn.disabled = false;
+        }
+        
+        // 更新传送门计数
+        function updatePortalCount() {
+            const portalCards = document.querySelectorAll('.portal-card');
+            const count = portalCards.length;
+            document.getElementById('portalCount').textContent = `(${count})`;
         }
         
         // ==================== 页面加载 ====================
