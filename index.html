@@ -910,16 +910,16 @@
 
         <!-- 控制按钮 -->
         <div class="controls">
-            <button class="btn" onclick="showAuthForm()">
+            <button class="btn" id="authBtn">
                 <i class="fas fa-hat-wizard"></i> 登录/注册
             </button>
-            <button class="btn" onclick="showAddPortalForm()" id="addPortalBtn" style="display: none;">
+            <button class="btn" id="addPortalBtn" style="display: none;">
                 <i class="fas fa-plus-circle"></i>记录传送门
             </button>
-            <button class="btn btn-secondary" onclick="loadPortals()">
+            <button class="btn btn-secondary" id="refreshBtn">
                 <i class="fas fa-sync-alt"></i> 刷新传送门
             </button>
-            <button class="btn btn-secondary" onclick="showMessage('功能开发中...', 'info')">
+            <button class="btn btn-secondary" id="searchBtn">
                 <i class="fas fa-search"></i> 搜索传送门
             </button>
         </div>
@@ -1097,7 +1097,8 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWtna2VocWxvcHdmcnNjZWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQyMzQsImV4cCI6MjA4MTE1MDIzNH0.HjlawMHv356F_NaxRagTYR7Q96UnCfAfFLie6XRk1Jg';
 
         // ==================== 全局变量 ====================
-        let supabase = null;
+        
+        //let supabase = null;
         let currentUser = null;
         let deletePortalId = null;
         let deleteButtonElement = null;
@@ -1123,12 +1124,15 @@
         async function init() {
             try {
                 // 创建 Supabase 客户端
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-                    auth: {
-                        persistSession: true,
-                        autoRefreshToken: true
-                    }
-                });
+                if (!window.supabaseClient) {
+                    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true
+                        }
+                    });
+                }
+                supabase = window.supabaseClient;
 
                 // 设置认证状态监听
                 supabase.auth.onAuthStateChange((event, session) => {
@@ -1618,6 +1622,15 @@
 
         // ==================== 页面加载 ====================
         document.addEventListener('DOMContentLoaded', function () {
+
+            // 添加事件监听器
+            document.getElementById('authBtn')?.addEventListener('click', showAuthForm);
+            document.getElementById('refreshBtn')?.addEventListener('click', loadPortals);
+            document.getElementById('searchBtn')?.addEventListener('click', function () {
+                showMessage('功能开发中...', 'info');
+            });
+            document.getElementById('addPortalBtn')?.addEventListener('click', showAddPortalForm);
+
             // 添加移动端触摸事件优化
             document.querySelectorAll('button, .btn, .auth-tab').forEach(element => {
                 element.addEventListener('touchstart', function () {
