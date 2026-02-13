@@ -1386,76 +1386,90 @@
 
                 // 渲染传送门卡片
                 portals.forEach(portal => {
-                    let isCreator = false;
-                    if (currentUser) {
-                        if (currentUser.id === '4af1a89f-763f-4567-8695-f9d71f42630f') {
-                            isCreator = true;
-                        } else {
-                            isCreator = currentUser && portal.created_by === currentUser.id;
+                    let show =false
+                    if (portal.who_can_see){
+                        if (portal.who_can_see == 'self'){
+                            if (currentUser) {
+                                if (currentUser.id === portal.created_by){
+                                    show = true
+                                }
+                            }
                         }
+                    }else{
+                        show = true
                     }
-
-                    const portalCard = document.createElement('div');
-                    portalCard.className = 'portal-card';
-                    portalCard.innerHTML = `
-                        <h3 class="portal-title">
-                            <i class="fas fa-door-open"></i> ${portal.title}
-                        </h3>
-                        <p class="portal-description">${portal.description || '暂无描述'}</p>
-                        <a href="${portal.url}" class="portal-url" target="_blank" rel="noopener">
-                            <i class="fas fa-external-link-alt"></i> ${portal.url}
-                        </a>
-                        
-                        ${portal.tags && portal.tags.length > 0 ? `
-                            <div class="portal-tags">
-                                ${portal.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                        
-                        <div class="portal-category">
-                            <i class="fas fa-tag"></i> ${portal.category || '未分类'}
-                        </div>
-                        
-                        <!-- 发布者信息 -->
-                        <div style="margin-top: 10px; font-size: 0.85rem; color: #a78bfa;">
-                            <i class="fas fa-user-circle"></i> 
-                            <span class="creator-info" title="创建时间: ${new Date(portal.created_at).toLocaleString()}">
-                                发布者: ${portal.display_name || '神秘学徒'}
-                            </span>
-                        </div>
-                        
-                        <div style="margin-top: 15px; font-size: 0.85rem; color: #a78bfa;">
-                            <i class="far fa-eye"></i> ${portal.views_count || 0} 浏览 · 
-                            <i class="fas fa-mouse-pointer"></i> ${portal.clicks_count || 0} 点击
-                        </div>
-                        
-                        <!-- 删除按钮 -->
-                        ${isCreator ? `
-                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(126, 105, 171, 0.3);">
-                                <button class="btn-delete" onclick="deletePortal('${portal.id}', this)">
-                                    <i class="fas fa-trash-alt"></i> 删除传送门
-                                </button>
-                            </div>
-                        ` : ''}
-                    `;
-
-                    // 点击卡片时增加点击计数（移动端优化）
-                    const urlLink = portalCard.querySelector('.portal-url');
-                    urlLink.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        try {
-                            await supabase.rpc('increment_portal_clicks', { portal_uuid: portal.id });
-                            // 延迟跳转，确保计数完成
-                            setTimeout(() => {
-                                window.open(portal.url, '_blank');
-                            }, 100);
-                        } catch (error) {
-                            console.log('点击计数失败:', error);
-                            window.open(portal.url, '_blank');
+                    if (show){
+                        let isCreator = false;
+                        if (currentUser) {
+                            if (currentUser.id === '4af1a89f-763f-4567-8695-f9d71f42630f') {
+                                isCreator = true;
+                            } else {
+                                isCreator = currentUser && portal.created_by === currentUser.id;
+                            }
                         }
-                    });
 
-                    portalsGrid.appendChild(portalCard);
+                        const portalCard = document.createElement('div');
+                        portalCard.className = 'portal-card';
+                        portalCard.innerHTML = `
+                            <h3 class="portal-title">
+                                <i class="fas fa-door-open"></i> ${portal.title}
+                            </h3>
+                            <p class="portal-description">${portal.description || '暂无描述'}</p>
+                            <a href="${portal.url}" class="portal-url" target="_blank" rel="noopener">
+                                <i class="fas fa-external-link-alt"></i> ${portal.url}
+                            </a>
+                            
+                            ${portal.tags && portal.tags.length > 0 ? `
+                                <div class="portal-tags">
+                                    ${portal.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="portal-category">
+                                <i class="fas fa-tag"></i> ${portal.category || '未分类'}
+                            </div>
+                            
+                            <!-- 发布者信息 -->
+                            <div style="margin-top: 10px; font-size: 0.85rem; color: #a78bfa;">
+                                <i class="fas fa-user-circle"></i> 
+                                <span class="creator-info" title="创建时间: ${new Date(portal.created_at).toLocaleString()}">
+                                    发布者: ${portal.display_name || '神秘学徒'}
+                                </span>
+                            </div>
+                            
+                            <div style="margin-top: 15px; font-size: 0.85rem; color: #a78bfa;">
+                                <i class="far fa-eye"></i> ${portal.views_count || 0} 浏览 · 
+                                <i class="fas fa-mouse-pointer"></i> ${portal.clicks_count || 0} 点击
+                            </div>
+                            
+                            <!-- 删除按钮 -->
+                            ${isCreator ? `
+                                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(126, 105, 171, 0.3);">
+                                    <button class="btn-delete" onclick="deletePortal('${portal.id}', this)">
+                                        <i class="fas fa-trash-alt"></i> 删除传送门
+                                    </button>
+                                </div>
+                            ` : ''}
+                        `;
+
+                        // 点击卡片时增加点击计数（移动端优化）
+                        const urlLink = portalCard.querySelector('.portal-url');
+                        urlLink.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            try {
+                                await supabase.rpc('increment_portal_clicks', { portal_uuid: portal.id });
+                                // 延迟跳转，确保计数完成
+                                setTimeout(() => {
+                                    window.open(portal.url, '_blank');
+                                }, 100);
+                            } catch (error) {
+                                console.log('点击计数失败:', error);
+                                window.open(portal.url, '_blank');
+                            }
+                        });
+
+                        portalsGrid.appendChild(portalCard);
+                    }
                 });
 
             } catch (error) {
