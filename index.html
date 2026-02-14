@@ -1515,7 +1515,11 @@
 			const tagsInput = document.getElementById('portalTags').value;
 			const displayName = document.getElementById('portalDisplayName').value ||
 				(currentUser ? maskEmail(currentUser.email) : '神秘学徒');
-			const who_can_see = document.getElementById('poportalWhocansee').value;
+			let who_can_see = document.getElementById('portalWhocansee').value;
+			if (who_can_see === 'null'){
+				who_can_see = null;
+			}
+			console.log(who_can_see);
 
 			if (!title || !url) {
 				showMessage('请填写网站名称和地址', 'error');
