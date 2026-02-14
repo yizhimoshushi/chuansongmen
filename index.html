@@ -2,1672 +2,1695 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🔮 魔术师的传送门</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* ====== 基础变量 ====== */
-        :root {
-            --purple-deep: #1a1033;
-            --purple-dark: #2d1b69;
-            --purple-medium: #7e69ab;
-            --purple-light: #c4b5fd;
-            --purple-accent: #8b5cf6;
-            --purple-gradient: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-deep) 100%);
-            --card-bg: rgba(46, 29, 105, 0.8);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            --glow: 0 0 20px rgba(139, 92, 246, 0.3);
-        }
-
-        /* ====== 重置与基础样式 ====== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%;
-        }
-
-        html {
-            -webkit-text-size-adjust: 100%;
-            touch-action: manipulation;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: var(--purple-gradient);
-            color: var(--purple-light);
-            min-height: 100vh;
-            line-height: 1.6;
-            overflow-x: hidden;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px;
-            width: 100%;
-        }
-
-        /* ====== 头部样式 ====== */
-        .header {
-            text-align: center;
-            padding: 25px 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%);
-            z-index: -1;
-        }
-
-        .logo {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .title {
-            font-size: 2rem;
-            background: linear-gradient(to right, #c4b5fd, #a78bfa, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-            word-break: break-word;
-        }
-
-        .subtitle {
-            color: var(--purple-medium);
-            font-size: 1rem;
-            max-width: 100%;
-            margin: 0 auto 20px;
-            padding: 0 10px;
-            word-break: break-word;
-        }
-
-        /* ====== 用户面板 ====== */
-        .user-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 100%;
-            border: 1px solid rgba(126, 105, 171, 0.5);
-            box-shadow: var(--shadow);
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .user-panel.active {
-            display: block;
-        }
-
-        .user-info h3 {
-            color: var(--purple-light);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.2rem;
-        }
-
-        .user-details {
-            background: rgba(139, 92, 246, 0.1);
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
-
-        .user-details p {
-            margin: 6px 0;
-            word-break: break-all;
-        }
-
-        /* ====== 控制按钮 ====== */
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, var(--purple-accent) 0%, #7c3aed 100%);
-            color: white;
-            border: none;
-            padding: 14px 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-            text-decoration: none;
-            min-height: 50px;
-            -webkit-appearance: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
-        .btn:hover,
-        .btn:active {
-            transform: translateY(-2px);
-            box-shadow: var(--glow);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--purple-medium) 0%, #6d28d9 100%);
-        }
-
-        /* ====== 传送门网格 ====== */
-        .portals-container {
-            margin: 30px 0;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            color: var(--purple-light);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(to right, var(--purple-accent), transparent);
-        }
-
-        .portals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .portal-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(126, 105, 171, 0.3);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .portal-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--purple-accent);
-            box-shadow: var(--glow);
-        }
-
-        .portal-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(to right, #8b5cf6, #7c3aed, #6d28d9);
-        }
-
-        .portal-title {
-            font-size: 1.2rem;
-            color: white;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            word-break: break-word;
-        }
-
-        .portal-title i {
-            color: var(--purple-accent);
-            flex-shrink: 0;
-        }
-
-        .portal-description {
-            color: #d1d5db;
-            margin: 12px 0;
-            line-height: 1.5;
-            flex-grow: 1;
-            word-break: break-word;
-        }
-
-        .portal-url {
-            color: var(--purple-light);
-            text-decoration: none;
-            display: inline-block;
-            margin: 10px 0;
-            font-size: 0.85rem;
-            word-break: break-all;
-            padding: 5px;
-            border-radius: 6px;
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .portal-url:hover,
-        .portal-url:active {
-            color: white;
-            text-decoration: underline;
-            background: rgba(139, 92, 246, 0.2);
-        }
-
-        .portal-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin: 12px 0;
-        }
-
-        .tag {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--purple-light);
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            white-space: nowrap;
-        }
-
-        .portal-category {
-            display: inline-block;
-            background: rgba(124, 58, 237, 0.3);
-            color: #ddd6fe;
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            margin: 8px 0;
-            align-self: flex-start;
-        }
-
-        /* ====== 发布者信息样式 ====== */
-        .creator-info {
-            background: rgba(139, 92, 246, 0.1);
-            padding: 4px 8px;
-            border-radius: 10px;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-left: 5px;
-            transition: all 0.3s;
-            word-break: break-word;
-        }
-
-        /* ====== 删除按钮样式 ====== */
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.1) !important;
-            color: #fca5a5 !important;
-            border: 1px solid rgba(239, 68, 68, 0.3) !important;
-            padding: 10px 15px !important;
-            border-radius: 8px !important;
-            cursor: pointer !important;
-            font-size: 0.85rem !important;
-            transition: all 0.3s !important;
-            margin-top: 15px;
-            width: 100%;
-            min-height: 40px;
-            -webkit-appearance: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
-        .btn-delete:hover,
-        .btn-delete:active {
-            background: rgba(239, 68, 68, 0.2) !important;
-            border-color: rgba(239, 68, 68, 0.5) !important;
-            transform: translateY(-1px) !important;
-        }
-
-        /* ====== 表单样式 ====== */
-        .form-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(26, 16, 51, 0.95);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: flex-start;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 20px 15px;
-            padding-top: max(20px, env(safe-area-inset-top));
-        }
-
-        .form-overlay.active {
-            display: flex;
-        }
-
-        .form-container {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            width: 100%;
-            max-width: 500px;
-            border: 1px solid var(--purple-medium);
-            box-shadow: var(--shadow);
-            margin: auto 0;
-        }
-
-        .form-title {
-            color: var(--purple-light);
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            display: block;
-            color: var(--purple-light);
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(126, 105, 171, 0.2);
-            border: 1px solid rgba(126, 105, 171, 0.5);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-            -webkit-appearance: none;
-            font-family: inherit;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--purple-accent);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
-
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        /* 方案二：创建更精美的分类选择器 */
-        .select-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .select-wrapper::after {
-            content: '▼';
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            color: #a78bfa;
-            font-size: 0.8rem;
-            pointer-events: none;
-        }
-
-        select.form-input {
-            /* 保持原有样式 */
-            width: 100%;
-            padding: 12px;
-            background: rgba(126, 105, 171, 0.2) !important;
-            border: 1px solid rgba(126, 105, 171, 0.5);
-            border-radius: 8px;
-            color: #c4b5fd !important;
-            font-size: 1rem;
-            transition: all 0.3s;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-            padding-right: 40px;
-        }
-
-        /* 关键修复：为选择框本身添加已选状态样式 */
-        select.form-input {
-            color: #c4b5fd !important;
-            background-color: rgba(46, 29, 105, 0.8) !important;
-        }
-
-        /* 下拉列表中的选项 */
-        select.form-input option {
-            background-color: #2d1b69 !important;
-            color: #c4b5fd !important;
-            padding: 12px;
-            font-size: 1rem;
-        }
-
-        /* 下拉列表中当前选中的选项（鼠标悬停或键盘导航时） */
-        select.form-input option:checked {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
-            color: white !important;
-        }
-
-        /* 下拉列表中鼠标悬停的选项 */
-        select.form-input option:hover {
-            background-color: #7c3aed !important;
-            color: white !important;
-        }
-
-        /* 为不同的分类添加特殊颜色（在下拉列表中） */
-        select.form-input option[value="魔法"] {
-            color: #a78bfa;
-        }
-
-        select.form-input option[value="有趣"] {
-            color: #fbbf24;
-        }
-
-        select.form-input option[value="塔罗牌"] {
-            color: #ec4899;
-        }
-
-        select.form-input option[value="工具"] {
-            color: #10b981;
-        }
-
-        select.form-input option[value="视频"] {
-            color: #3b82f6;
-        }
-
-        select.form-input option[value="小说"] {
-            color: #8b5cf6;
-        }
-
-        select.form-input option[value="游戏"] {
-            color: #ef4444;
-        }
-
-        select.form-input option[value="技术"] {
-            color: #06b6d4;
-        }
-
-        select.form-input option[value="其他"] {
-            color: #94a3b8;
-        }
-
-        /* 移动端优化 */
-        @media (max-width: 480px) {
-            select.form-input {
-                padding: 10px;
-                font-size: 0.95rem;
-            }
-
-            .select-wrapper::after {
-                right: 12px;
-            }
-        }
-
-        /* 确保所有表单输入都有正确的颜色 */
-        input.form-input,
-        textarea.form-input {
-            color: #c4b5fd !important;
-        }
-
-        select.form-input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-            background: rgba(126, 105, 171, 0.3) !important;
-        }
-
-        /* 下拉选项样式 */
-        select.form-input option {
-            background-color: #2d1b69;
-            color: #c4b5fd;
-            padding: 12px;
-            font-size: 1rem;
-        }
-
-        select.form-input option:checked {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            color: white;
-        }
-
-        /* 悬停效果 */
-        select.form-input option:hover {
-            background-color: #7c3aed;
-        }
-
-        /* 为不同的分类添加图标指示 */
-        select.form-input {
-            /* 移除默认箭头 */
-            background-image: none;
-        }
-
-        /* 自定义分类指示器 */
-        .category-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* 移动端优化 */
-        @media (max-width: 480px) {
-            select.form-input {
-                padding: 10px;
-                font-size: 0.95rem;
-            }
-
-            .select-wrapper::after {
-                right: 12px;
-            }
-        }
-
-        /* ====== 登录/注册表单 ====== */
-        .auth-tabs {
-            display: flex;
-            border-bottom: 1px solid rgba(126, 105, 171, 0.3);
-            margin-bottom: 20px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .auth-tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            color: var(--purple-medium);
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-            min-width: 80px;
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        .auth-tab.active {
-            color: var(--purple-light);
-            border-bottom-color: var(--purple-accent);
-        }
-
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-        }
-
-        /* ====== 消息提示 ====== */
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
-            display: none;
-            animation: slideIn 0.3s ease;
-            word-break: break-word;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.success {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.5);
-            color: #86efac;
-        }
-
-        .message.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            color: #fca5a5;
-        }
-
-        .message.info {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.5);
-            color: #93c5fd;
-        }
-
-        /* ====== 加载动画 ====== */
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: var(--purple-medium);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(126, 105, 171, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--purple-accent);
-            animation: spin 1s linear infinite;
-            margin-bottom: 10px;
-        }
-
-        /* ====== 确认对话框样式 ====== */
-        .confirm-dialog {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(26, 16, 51, 0.95);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            animation: fadeIn 0.3s ease;
-            padding: 20px;
-            padding-top: max(20px, env(safe-area-inset-top));
-        }
-
-        .confirm-dialog.active {
-            display: flex;
-        }
-
-        .confirm-box {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            width: 100%;
-            max-width: 350px;
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .confirm-title {
-            color: #fca5a5;
-            font-size: 1.3rem;
-            margin-bottom: 12px;
-        }
-
-        .confirm-message {
-            color: var(--purple-light);
-            margin-bottom: 20px;
-            line-height: 1.5;
-            word-break: break-word;
-        }
-
-        .confirm-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-confirm,
-        .btn-cancel {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-            min-width: 120px;
-            min-height: 45px;
-            -webkit-appearance: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
-        .btn-cancel {
-            background: linear-gradient(135deg, var(--purple-medium) 0%, #6d28d9 100%);
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            to {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-        }
-
-        /* ====== 响应式设计 ====== */
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-
-            .logo {
-                font-size: 2.2rem;
-            }
-
-            .title {
-                font-size: 1.6rem;
-            }
-
-            .portals-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-
-            .controls {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .btn {
-                padding: 12px;
-                font-size: 0.9rem;
-                min-height: 45px;
-            }
-
-            .form-container {
-                padding: 20px;
-            }
-
-            .form-title {
-                font-size: 1.3rem;
-            }
-
-            .form-input {
-                padding: 10px;
-                font-size: 0.95rem;
-            }
-
-            .portal-card {
-                padding: 15px;
-            }
-
-            .portal-title {
-                font-size: 1.1rem;
-            }
-        }
-
-        @media (max-width: 768px) and (min-width: 481px) {
-            .portals-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* ====== 页脚 ====== */
-        .footer {
-            text-align: center;
-            padding: 20px 15px;
-            margin-top: 30px;
-            color: var(--purple-medium);
-            border-top: 1px solid rgba(126, 105, 171, 0.3);
-            font-size: 0.9rem;
-        }
-
-        .footer a {
-            color: var(--purple-light);
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>🔮 魔术师的传送门</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		/* ====== 基础变量 ====== */
+		:root {
+			--purple-deep: #1a1033;
+			--purple-dark: #2d1b69;
+			--purple-medium: #7e69ab;
+			--purple-light: #c4b5fd;
+			--purple-accent: #8b5cf6;
+			--purple-gradient: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-deep) 100%);
+			--card-bg: rgba(46, 29, 105, 0.8);
+			--shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+			--glow: 0 0 20px rgba(139, 92, 246, 0.3);
+		}
+
+		/* ====== 重置与基础样式 ====== */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			-webkit-tap-highlight-color: transparent;
+			-webkit-text-size-adjust: 100%;
+		}
+
+		html {
+			-webkit-text-size-adjust: 100%;
+			touch-action: manipulation;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+			background: var(--purple-gradient);
+			color: var(--purple-light);
+			min-height: 100vh;
+			line-height: 1.6;
+			overflow-x: hidden;
+			padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 15px;
+			width: 100%;
+		}
+
+		/* ====== 头部样式 ====== */
+		.header {
+			text-align: center;
+			padding: 25px 15px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.header::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background:
+				radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+				radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%);
+			z-index: -1;
+		}
+
+		.logo {
+			font-size: 2.8rem;
+			margin-bottom: 10px;
+			animation: float 6s ease-in-out infinite;
+		}
+
+		@keyframes float {
+
+			0%,
+			100% {
+				transform: translateY(0px);
+			}
+
+			50% {
+				transform: translateY(-10px);
+			}
+		}
+
+		.title {
+			font-size: 2rem;
+			background: linear-gradient(to right, #c4b5fd, #a78bfa, #8b5cf6);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 8px;
+			text-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+			word-break: break-word;
+		}
+
+		.subtitle {
+			color: var(--purple-medium);
+			font-size: 1rem;
+			max-width: 100%;
+			margin: 0 auto 20px;
+			padding: 0 10px;
+			word-break: break-word;
+		}
+
+		/* ====== 用户面板 ====== */
+		.user-panel {
+			background: var(--card-bg);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 20px;
+			margin: 20px auto;
+			max-width: 100%;
+			border: 1px solid rgba(126, 105, 171, 0.5);
+			box-shadow: var(--shadow);
+			display: none;
+			animation: fadeIn 0.5s ease;
+		}
+
+		.user-panel.active {
+			display: block;
+		}
+
+		.user-info h3 {
+			color: var(--purple-light);
+			margin-bottom: 12px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-size: 1.2rem;
+		}
+
+		.user-details {
+			background: rgba(139, 92, 246, 0.1);
+			padding: 12px;
+			border-radius: 10px;
+			margin-bottom: 15px;
+			font-size: 0.9rem;
+		}
+
+		.user-details p {
+			margin: 6px 0;
+			word-break: break-all;
+		}
+
+		/* ====== 控制按钮 ====== */
+		.controls {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+			gap: 10px;
+			margin: 20px 0;
+		}
+
+		.btn {
+			background: linear-gradient(135deg, var(--purple-accent) 0%, #7c3aed 100%);
+			color: white;
+			border: none;
+			padding: 14px 16px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-size: 0.95rem;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			transition: all 0.3s;
+			text-decoration: none;
+			min-height: 50px;
+			-webkit-appearance: none;
+			user-select: none;
+			touch-action: manipulation;
+		}
+
+		.btn:hover,
+		.btn:active {
+			transform: translateY(-2px);
+			box-shadow: var(--glow);
+		}
+
+		.btn-danger {
+			background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+		}
+
+		.btn-secondary {
+			background: linear-gradient(135deg, var(--purple-medium) 0%, #6d28d9 100%);
+		}
+
+		/* ====== 传送门网格 ====== */
+		.portals-container {
+			margin: 30px 0;
+		}
+
+		.section-title {
+			font-size: 1.5rem;
+			color: var(--purple-light);
+			margin-bottom: 20px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.section-title::after {
+			content: '';
+			flex: 1;
+			height: 2px;
+			background: linear-gradient(to right, var(--purple-accent), transparent);
+		}
+
+		.portals-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			gap: 15px;
+			margin-top: 15px;
+		}
+
+		.portal-card {
+			background: var(--card-bg);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 20px;
+			border: 1px solid rgba(126, 105, 171, 0.3);
+			transition: all 0.3s;
+			position: relative;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.portal-card:hover {
+			transform: translateY(-3px);
+			border-color: var(--purple-accent);
+			box-shadow: var(--glow);
+		}
+
+		.portal-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 3px;
+			background: linear-gradient(to right, #8b5cf6, #7c3aed, #6d28d9);
+		}
+
+		.portal-title {
+			font-size: 1.2rem;
+			color: white;
+			margin-bottom: 10px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			word-break: break-word;
+		}
+
+		.portal-title i {
+			color: var(--purple-accent);
+			flex-shrink: 0;
+		}
+
+		.portal-description {
+			color: #d1d5db;
+			margin: 12px 0;
+			line-height: 1.5;
+			flex-grow: 1;
+			word-break: break-word;
+		}
+
+		.portal-url {
+			color: var(--purple-light);
+			text-decoration: none;
+			display: inline-block;
+			margin: 10px 0;
+			font-size: 0.85rem;
+			word-break: break-all;
+			padding: 5px;
+			border-radius: 6px;
+			background: rgba(139, 92, 246, 0.1);
+		}
+
+		.portal-url:hover,
+		.portal-url:active {
+			color: white;
+			text-decoration: underline;
+			background: rgba(139, 92, 246, 0.2);
+		}
+
+		.portal-tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+			margin: 12px 0;
+		}
+
+		.tag {
+			background: rgba(139, 92, 246, 0.2);
+			color: var(--purple-light);
+			padding: 4px 10px;
+			border-radius: 15px;
+			font-size: 0.8rem;
+			border: 1px solid rgba(139, 92, 246, 0.3);
+			white-space: nowrap;
+		}
+
+		.portal-category {
+			display: inline-block;
+			background: rgba(124, 58, 237, 0.3);
+			color: #ddd6fe;
+			padding: 5px 12px;
+			border-radius: 12px;
+			font-size: 0.85rem;
+			margin: 8px 0;
+			align-self: flex-start;
+		}
+
+		/* ====== 发布者信息样式 ====== */
+		.creator-info {
+			background: rgba(139, 92, 246, 0.1);
+			padding: 4px 8px;
+			border-radius: 10px;
+			border: 1px solid rgba(139, 92, 246, 0.3);
+			font-size: 0.8rem;
+			display: inline-block;
+			margin-left: 5px;
+			transition: all 0.3s;
+			word-break: break-word;
+		}
+
+		/* ====== 删除按钮样式 ====== */
+		.btn-delete {
+			background: rgba(239, 68, 68, 0.1) !important;
+			color: #fca5a5 !important;
+			border: 1px solid rgba(239, 68, 68, 0.3) !important;
+			padding: 10px 15px !important;
+			border-radius: 8px !important;
+			cursor: pointer !important;
+			font-size: 0.85rem !important;
+			transition: all 0.3s !important;
+			margin-top: 15px;
+			width: 100%;
+			min-height: 40px;
+			-webkit-appearance: none;
+			user-select: none;
+			touch-action: manipulation;
+		}
+
+		.btn-delete:hover,
+		.btn-delete:active {
+			background: rgba(239, 68, 68, 0.2) !important;
+			border-color: rgba(239, 68, 68, 0.5) !important;
+			transform: translateY(-1px) !important;
+		}
+
+		/* ====== 表单样式 ====== */
+		.form-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(26, 16, 51, 0.95);
+			backdrop-filter: blur(5px);
+			display: none;
+			align-items: flex-start;
+			justify-content: center;
+			z-index: 1000;
+			animation: fadeIn 0.3s ease;
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+			padding: 20px 15px;
+			padding-top: max(20px, env(safe-area-inset-top));
+		}
+
+		.form-overlay.active {
+			display: flex;
+		}
+
+		.form-container {
+			background: var(--card-bg);
+			border-radius: 15px;
+			padding: 25px;
+			width: 100%;
+			max-width: 500px;
+			border: 1px solid var(--purple-medium);
+			box-shadow: var(--shadow);
+			margin: auto 0;
+		}
+
+		.form-title {
+			color: var(--purple-light);
+			margin-bottom: 20px;
+			text-align: center;
+			font-size: 1.5rem;
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		.form-label {
+			display: block;
+			color: var(--purple-light);
+			margin-bottom: 6px;
+			font-weight: 500;
+			font-size: 0.95rem;
+		}
+
+		.form-input {
+			width: 100%;
+			padding: 12px;
+			background: rgba(126, 105, 171, 0.2);
+			border: 1px solid rgba(126, 105, 171, 0.5);
+			border-radius: 8px;
+			color: white;
+			font-size: 1rem;
+			transition: all 0.3s;
+			-webkit-appearance: none;
+			font-family: inherit;
+		}
+
+		.form-input:focus {
+			outline: none;
+			border-color: var(--purple-accent);
+			box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+		}
+
+		.form-textarea {
+			min-height: 100px;
+			resize: vertical;
+		}
+
+		.form-actions {
+			display: flex;
+			gap: 10px;
+			margin-top: 20px;
+			flex-wrap: wrap;
+		}
+
+		/* 方案二：创建更精美的分类选择器 */
+		.select-wrapper {
+			position: relative;
+			width: 100%;
+		}
+
+		.select-wrapper::after {
+			content: '▼';
+			position: absolute;
+			top: 50%;
+			right: 15px;
+			transform: translateY(-50%);
+			color: #a78bfa;
+			font-size: 0.8rem;
+			pointer-events: none;
+		}
+
+		select.form-input {
+			/* 保持原有样式 */
+			width: 100%;
+			padding: 12px;
+			background: rgba(126, 105, 171, 0.2) !important;
+			border: 1px solid rgba(126, 105, 171, 0.5);
+			border-radius: 8px;
+			color: #c4b5fd !important;
+			font-size: 1rem;
+			transition: all 0.3s;
+			appearance: none;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			cursor: pointer;
+			padding-right: 40px;
+		}
+
+		/* 关键修复：为选择框本身添加已选状态样式 */
+		select.form-input {
+			color: #c4b5fd !important;
+			background-color: rgba(46, 29, 105, 0.8) !important;
+		}
+
+		/* 下拉列表中的选项 */
+		select.form-input option {
+			background-color: #2d1b69 !important;
+			color: #c4b5fd !important;
+			padding: 12px;
+			font-size: 1rem;
+		}
+
+		/* 下拉列表中当前选中的选项（鼠标悬停或键盘导航时） */
+		select.form-input option:checked {
+			background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+			color: white !important;
+		}
+
+		/* 下拉列表中鼠标悬停的选项 */
+		select.form-input option:hover {
+			background-color: #7c3aed !important;
+			color: white !important;
+		}
+
+		/* 为不同的分类添加特殊颜色（在下拉列表中） */
+		select.form-input option[value="魔法"] {
+			color: #a78bfa;
+		}
+
+		select.form-input option[value="有趣"] {
+			color: #fbbf24;
+		}
+
+		select.form-input option[value="塔罗牌"] {
+			color: #ec4899;
+		}
+
+		select.form-input option[value="工具"] {
+			color: #10b981;
+		}
+
+		select.form-input option[value="视频"] {
+			color: #3b82f6;
+		}
+
+		select.form-input option[value="小说"] {
+			color: #8b5cf6;
+		}
+
+		select.form-input option[value="游戏"] {
+			color: #ef4444;
+		}
+
+		select.form-input option[value="技术"] {
+			color: #06b6d4;
+		}
+
+		select.form-input option[value="其他"] {
+			color: #94a3b8;
+		}
+
+		/* 移动端优化 */
+		@media (max-width: 480px) {
+			select.form-input {
+				padding: 10px;
+				font-size: 0.95rem;
+			}
+
+			.select-wrapper::after {
+				right: 12px;
+			}
+		}
+
+		/* 确保所有表单输入都有正确的颜色 */
+		input.form-input,
+		textarea.form-input {
+			color: #c4b5fd !important;
+		}
+
+		select.form-input:focus {
+			outline: none;
+			border-color: #8b5cf6;
+			box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+			background: rgba(126, 105, 171, 0.3) !important;
+		}
+
+		/* 下拉选项样式 */
+		select.form-input option {
+			background-color: #2d1b69;
+			color: #c4b5fd;
+			padding: 12px;
+			font-size: 1rem;
+		}
+
+		select.form-input option:checked {
+			background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+			color: white;
+		}
+
+		/* 悬停效果 */
+		select.form-input option:hover {
+			background-color: #7c3aed;
+		}
+
+		/* 为不同的分类添加图标指示 */
+		select.form-input {
+			/* 移除默认箭头 */
+			background-image: none;
+		}
+
+		/* 自定义分类指示器 */
+		.category-option {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		/* 移动端优化 */
+		@media (max-width: 480px) {
+			select.form-input {
+				padding: 10px;
+				font-size: 0.95rem;
+			}
+
+			.select-wrapper::after {
+				right: 12px;
+			}
+		}
+
+		/* ====== 登录/注册表单 ====== */
+		.auth-tabs {
+			display: flex;
+			border-bottom: 1px solid rgba(126, 105, 171, 0.3);
+			margin-bottom: 20px;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.auth-tab {
+			flex: 1;
+			text-align: center;
+			padding: 12px;
+			cursor: pointer;
+			color: var(--purple-medium);
+			transition: all 0.3s;
+			border-bottom: 3px solid transparent;
+			min-width: 80px;
+			white-space: nowrap;
+			user-select: none;
+		}
+
+		.auth-tab.active {
+			color: var(--purple-light);
+			border-bottom-color: var(--purple-accent);
+		}
+
+		.auth-form {
+			display: none;
+		}
+
+		.auth-form.active {
+			display: block;
+		}
+
+		/* ====== 消息提示 ====== */
+		.message {
+			padding: 12px;
+			border-radius: 8px;
+			margin: 12px 0;
+			display: none;
+			animation: slideIn 0.3s ease;
+			word-break: break-word;
+		}
+
+		.message.show {
+			display: block;
+		}
+
+		.message.success {
+			background: rgba(34, 197, 94, 0.2);
+			border: 1px solid rgba(34, 197, 94, 0.5);
+			color: #86efac;
+		}
+
+		.message.error {
+			background: rgba(239, 68, 68, 0.2);
+			border: 1px solid rgba(239, 68, 68, 0.5);
+			color: #fca5a5;
+		}
+
+		.message.info {
+			background: rgba(59, 130, 246, 0.2);
+			border: 1px solid rgba(59, 130, 246, 0.5);
+			color: #93c5fd;
+		}
+
+		/* ====== 加载动画 ====== */
+		.loading {
+			text-align: center;
+			padding: 30px;
+			color: var(--purple-medium);
+		}
+
+		.spinner {
+			display: inline-block;
+			width: 30px;
+			height: 30px;
+			border: 3px solid rgba(126, 105, 171, 0.3);
+			border-radius: 50%;
+			border-top-color: var(--purple-accent);
+			animation: spin 1s linear infinite;
+			margin-bottom: 10px;
+		}
+
+		/* ====== 确认对话框样式 ====== */
+		.confirm-dialog {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(26, 16, 51, 0.95);
+			backdrop-filter: blur(5px);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 2000;
+			animation: fadeIn 0.3s ease;
+			padding: 20px;
+			padding-top: max(20px, env(safe-area-inset-top));
+		}
+
+		.confirm-dialog.active {
+			display: flex;
+		}
+
+		.confirm-box {
+			background: var(--card-bg);
+			border-radius: 15px;
+			padding: 25px;
+			width: 100%;
+			max-width: 350px;
+			border: 1px solid rgba(239, 68, 68, 0.5);
+			box-shadow: var(--shadow);
+			text-align: center;
+		}
+
+		.confirm-title {
+			color: #fca5a5;
+			font-size: 1.3rem;
+			margin-bottom: 12px;
+		}
+
+		.confirm-message {
+			color: var(--purple-light);
+			margin-bottom: 20px;
+			line-height: 1.5;
+			word-break: break-word;
+		}
+
+		.confirm-actions {
+			display: flex;
+			gap: 10px;
+			justify-content: center;
+			flex-wrap: wrap;
+		}
+
+		.btn-confirm,
+		.btn-cancel {
+			background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+			color: white;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			font-weight: 600;
+			flex: 1;
+			min-width: 120px;
+			min-height: 45px;
+			-webkit-appearance: none;
+			user-select: none;
+			touch-action: manipulation;
+		}
+
+		.btn-cancel {
+			background: linear-gradient(135deg, var(--purple-medium) 0%, #6d28d9 100%);
+		}
+
+		@keyframes spin {
+			to {
+				transform: rotate(360deg);
+			}
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes fadeOut {
+			from {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			to {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+		}
+
+		/* ====== 响应式设计 ====== */
+		@media (max-width: 480px) {
+			.container {
+				padding: 10px;
+			}
+
+			.logo {
+				font-size: 2.2rem;
+			}
+
+			.title {
+				font-size: 1.6rem;
+			}
+
+			.portals-grid {
+				grid-template-columns: 1fr;
+				gap: 12px;
+			}
+
+			.controls {
+				grid-template-columns: 1fr;
+				gap: 8px;
+			}
+
+			.btn {
+				padding: 12px;
+				font-size: 0.9rem;
+				min-height: 45px;
+			}
+
+			.form-container {
+				padding: 20px;
+			}
+
+			.form-title {
+				font-size: 1.3rem;
+			}
+
+			.form-input {
+				padding: 10px;
+				font-size: 0.95rem;
+			}
+
+			.portal-card {
+				padding: 15px;
+			}
+
+			.portal-title {
+				font-size: 1.1rem;
+			}
+		}
+
+		@media (max-width: 768px) and (min-width: 481px) {
+			.portals-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		/* ====== 页脚 ====== */
+		.footer {
+			text-align: center;
+			padding: 20px 15px;
+			margin-top: 30px;
+			color: var(--purple-medium);
+			border-top: 1px solid rgba(126, 105, 171, 0.3);
+			font-size: 0.9rem;
+		}
+
+		.footer a {
+			color: var(--purple-light);
+			text-decoration: none;
+		}
+
+		.footer a:hover {
+			text-decoration: underline;
+		}
+	</style>
+	<script src="https://cdn.jsdelivr.net/npm/vconsole"></script>
 </head>
 
 <body>
-    <!-- 头部 -->
-    <div class="header">
-        <div class="logo">🔮</div>
-        <h1 class="title">魔术师的传送门</h1>
-        <p class="subtitle">连接神秘世界的门户，分享你的魔法收藏</p>
-    </div>
-
-    <div class="container">
-        <!-- 用户面板 -->
-        <div class="user-panel" id="userPanel">
-            <div class="user-info">
-                <h3><i class="fas fa-hat-wizard"></i> 欢迎，魔法学徒！</h3>
-                <div class="user-details" id="userDetails">
-                    <!-- 用户信息动态填充 -->
-                </div>
-                <button class="btn btn-danger" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> 退出登录
-                </button>
-            </div>
-        </div>
-
-        <!-- 控制按钮 -->
-        <div class="controls">
-            <button class="btn" id="authBtn">
-                <i class="fas fa-hat-wizard"></i> 登录/注册
-            </button>
-            <button class="btn" id="addPortalBtn" style="display: none;">
-                <i class="fas fa-plus-circle"></i>记录传送门
-            </button>
-            <button class="btn btn-secondary" id="refreshBtn">
-                <i class="fas fa-sync-alt"></i> 刷新传送门
-            </button>
-            <button class="btn btn-secondary" id="searchBtn">
-                <i class="fas fa-search"></i> 搜索传送门
-            </button>
-        </div>
-
-        <!-- 消息提示 -->
-        <div class="message" id="message"></div>
-
-        <!-- 传送门列表 -->
-        <div class="portals-container">
-            <h2 class="section-title">
-                <i class="fas fa-door-open"></i> 魔法传送门
-                <span class="portal-count" id="portalCount">(0)</span>
-            </h2>
-
-            <div class="portals-grid" id="portalsGrid">
-                <!-- 传送门卡片动态填充 -->
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>正在召唤传送门...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 页脚 -->
-        <div class="footer">
-            <p>🔮 魔术师的传送门 | 用魔法连接世界</p>
-            <p>Powered by <a href="https://supabase.com" target="_blank">Supabase</a></p>
-        </div>
-    </div>
-
-    <!-- 登录/注册表单 -->
-    <div class="form-overlay" id="authForm">
-        <div class="form-container">
-            <h2 class="form-title">🔐 进入神秘世界</h2>
-
-            <div class="auth-tabs">
-                <div class="auth-tab active" onclick="switchAuthTab('login')">登录</div>
-                <div class="auth-tab" onclick="switchAuthTab('register')">注册</div>
-            </div>
-
-            <!-- 登录表单 -->
-            <div class="auth-form active" id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">邮箱</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"
-                        inputmode="email">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">密码</label>
-                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
-                </div>
-                <div class="form-actions">
-                    <button class="btn" onclick="login()">
-                        <i class="fas fa-sign-in-alt"></i> 进入神秘世界
-                    </button>
-                    <button class="btn btn-secondary" onclick="hideAuthForm()">
-                        取消
-                    </button>
-                </div>
-            </div>
-
-            <!-- 注册表单 -->
-            <div class="auth-form" id="registerForm">
-                <div class="form-group">
-                    <label class="form-label">邮箱</label>
-                    <input type="email" class="form-input" id="registerEmail" placeholder="your@email.com"
-                        inputmode="email">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">密码 (最少6位)</label>
-                    <input type="password" class="form-input" id="registerPassword" placeholder="••••••••">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">确认密码</label>
-                    <input type="password" class="form-input" id="registerConfirmPassword" placeholder="••••••••">
-                </div>
-                <div class="form-actions">
-                    <button class="btn" onclick="register()">
-                        <i class="fas fa-user-plus"></i> 成为魔法学徒
-                    </button>
-                    <button class="btn btn-secondary" onclick="hideAuthForm()">
-                        取消
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 添加传送门表单 -->
-    <div class="form-overlay" id="addPortalForm">
-        <div class="form-container">
-            <h2 class="form-title">✨ 创建新传送门</h2>
-
-            <div class="form-group">
-                <label class="form-label">网站名称</label>
-                <input type="text" class="form-input" id="portalTitle" placeholder="例如：我的世界 Wiki">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">网站地址 (URL)</label>
-                <input type="url" class="form-input" id="portalUrl" placeholder="https://example.com" inputmode="url">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">网站描述</label>
-                <textarea class="form-input form-textarea" id="portalDescription"
-                    placeholder="描述这个网站的神奇之处..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">分类</label>
-                <div class="select-wrapper">
-                    <select class="form-input" id="portalCategory">
-                        <option value="魔法">🔮 魔法</option>
-                        <option value="有趣">✨ 有趣</option>
-                        <option value="塔罗牌">🃏 塔罗牌</option>
-                        <option value="工具">⚗️ 工具</option>
-                        <option value="视频">📖 视频</option>
-                        <option value="小说">📚 小说</option>
-                        <option value="游戏">🎮 游戏</option>
-                        <option value="技术">💻 技术</option>
-                        <option value="其他">🌀 其他</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">发布者名称</label>
-                <input type="text" class="form-input" id="portalDisplayName" placeholder="例如：神秘学徒等" maxlength="20">
-                <small style="color: var(--purple-medium); font-size: 0.85rem;">
-                    这是别人看到的你的名称（可选，默认显示邮箱）
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">标签 (用逗号分隔)</label>
-                <input type="text" class="form-input" id="portalTags" placeholder="例如：魔法, 小说, 游戏">
-            </div>
-
-            <div class="form-actions">
-                <button class="btn" onclick="addPortal()">
-                    <i class="fas fa-magic"></i> 记录魔法
-                </button>
-                <button class="btn btn-secondary" onclick="hideAddPortalForm()">
-                    取消
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 删除确认对话框 -->
-    <div class="confirm-dialog" id="deleteConfirmDialog">
-        <div class="confirm-box">
-            <h3 class="confirm-title"><i class="fas fa-exclamation-triangle"></i> 确认删除</h3>
-            <p class="confirm-message" id="deleteConfirmMessage">
-                确定要删除这个传送门吗？此操作不可撤销。
-            </p>
-            <div class="confirm-actions">
-                <button class="btn-confirm" onclick="confirmDelete()">
-                    <i class="fas fa-trash-alt"></i> 确认删除
-                </button>
-                <button class="btn-cancel" onclick="cancelDelete()">
-                    <i class="fas fa-times"></i> 取消
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 引入 Supabase -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-    <script>
-        // ==================== 配置 ====================
-        const SUPABASE_URL = 'https://plakgkehqlopwfrsceem.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWtna2VocWxvcHdmcnNjZWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQyMzQsImV4cCI6MjA4MTE1MDIzNH0.HjlawMHv356F_NaxRagTYR7Q96UnCfAfFLie6XRk1Jg';
-
-        // ==================== 全局变量 ====================
-        
-        //let supabase = null;
-        let currentUser = null;
-        let deletePortalId = null;
-        let deleteButtonElement = null;
-
-        // ==================== 移动端优化函数 ====================
-        function preventZoom(event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
-        }
-
-        // 禁止双指缩放
-        document.addEventListener('touchstart', preventZoom, { passive: false });
-
-        // 修复移动端点击延迟
-        if ('addEventListener' in document) {
-            document.addEventListener('DOMContentLoaded', function () {
-                FastClick.attach(document.body);
-            }, false);
-        }
-
-        // ==================== 初始化 ====================
-        async function init() {
-            try {
-                // 创建 Supabase 客户端
-                if (!window.supabaseClient) {
-                    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-                        auth: {
-                            persistSession: true,
-                            autoRefreshToken: true
-                        }
-                    });
-                }
-                supabase = window.supabaseClient;
-
-                // 设置认证状态监听
-                supabase.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN' && session) {
-                        currentUser = session.user;
-                        updateUserPanel();
-                        showMessage(`🎉 欢迎回来，${currentUser.email}！`, 'success');
-                    } else if (event === 'SIGNED_OUT') {
-                        currentUser = null;
-                        updateUserPanel();
-                    }
-                });
-
-                // 检查当前会话
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    currentUser = session.user;
-                    updateUserPanel();
-                }
-
-                // 加载传送门
-                loadPortals();
-
-            } catch (error) {
-                showMessage(`初始化失败: ${error.message}`, 'error');
-            }
-        }
-
-        // ==================== 用户界面函数 ====================
-        function updateUserPanel() {
-            const userPanel = document.getElementById('userPanel');
-            const addPortalBtn = document.getElementById('addPortalBtn');
-            const userDetails = document.getElementById('userDetails');
-
-            if (currentUser) {
-                userPanel.classList.add('active');
-                addPortalBtn.style.display = 'flex';
-
-                userDetails.innerHTML = `
-                    <p><strong>🔮 学徒邮箱:</strong> ${currentUser.email}</p>
-                    <p><strong>🎫 用户ID:</strong> ${currentUser.id.substring(0, 12)}...</p>
-                    <p><strong>⏰ 注册时间:</strong> ${new Date(currentUser.created_at).toLocaleString()}</p>
-                `;
-            } else {
-                userPanel.classList.remove('active');
-                addPortalBtn.style.display = 'none';
-            }
-        }
-
-        // ==================== 表单控制 ====================
-        function showAuthForm() {
-            document.getElementById('authForm').classList.add('active');
-            // 滚动到顶部
-            document.querySelector('.form-overlay').scrollTop = 0;
-        }
-
-        function hideAuthForm() {
-            document.getElementById('authForm').classList.remove('active');
-        }
-
-        function switchAuthTab(tab) {
-            // 更新标签
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-
-            if (tab === 'login') {
-                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
-                document.getElementById('loginForm').classList.add('active');
-            } else {
-                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
-                document.getElementById('registerForm').classList.add('active');
-            }
-        }
-
-        function showAddPortalForm() {
-            if (!currentUser) {
-                showMessage('请先登录才能添加传送门', 'error');
-                return;
-            }
-            document.getElementById('addPortalForm').classList.add('active');
-            // 滚动到顶部
-            document.querySelector('.form-overlay').scrollTop = 0;
-        }
-
-        function hideAddPortalForm() {
-            document.getElementById('addPortalForm').classList.remove('active');
-        }
-
-        // ==================== 消息提示 ====================
-        function showMessage(text, type = 'info') {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type} show`;
-
-            setTimeout(() => {
-                messageDiv.classList.remove('show');
-            }, 5000);
-        }
-
-        // ==================== 邮箱脱敏函数 ====================
-        function maskEmail(email) {
-            if (!email || typeof email !== 'string') return '神秘学徒';
-
-            const [name, domain] = email.split('@');
-            if (!name || !domain) return email;
-
-            if (name.length <= 2) {
-                return `${name.charAt(0)}***@${domain}`;
-            }
-            return `${name.charAt(0)}***${name.charAt(name.length - 1)}@${domain}`;
-        }
-
-        // ==================== 认证功能 ====================
-        async function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (!email || !password) {
-                showMessage('请输入邮箱和密码', 'error');
-                return;
-            }
-
-            // 显示加载状态
-            const loginBtn = document.querySelector('#loginForm .btn');
-            const originalText = loginBtn.innerHTML;
-            loginBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 登录中...';
-            loginBtn.disabled = true;
-
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error) throw error;
-
-                showMessage(`🔮 欢迎进入神秘世界！`, 'success');
-                hideAuthForm();
-                loadPortals();
-
-            } catch (error) {
-                showMessage(`登录失败: ${error.message}`, 'error');
-            } finally {
-                // 恢复按钮状态
-                loginBtn.innerHTML = originalText;
-                loginBtn.disabled = false;
-            }
-        }
-
-        async function register() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-
-            if (!email || !password) {
-                showMessage('请输入邮箱和密码', 'error');
-                return;
-            }
-
-            if (password.length < 6) {
-                showMessage('密码至少需要6位', 'error');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showMessage('两次输入的密码不一致', 'error');
-                return;
-            }
-
-            // 显示加载状态
-            const registerBtn = document.querySelector('#registerForm .btn');
-            const originalText = registerBtn.innerHTML;
-            registerBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 注册中...';
-            registerBtn.disabled = true;
-
-            try {
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password
-                });
-
-                if (error) {
-                    // 如果用户已存在，尝试登录
-                    if (error.message.includes('already registered')) {
-                        showMessage('用户已存在，尝试登录...', 'info');
-                        await login();
-                        return;
-                    }
-                    throw error;
-                }
-
-                showMessage(`✨ 注册成功！欢迎新的魔法学徒！`, 'success');
-                hideAuthForm();
-
-                // 如果注册后自动登录了
-                if (data.session) {
-                    currentUser = data.user;
-                    updateUserPanel();
-                }
-
-            } catch (error) {
-                showMessage(`注册失败: ${error.message}`, 'error');
-            } finally {
-                // 恢复按钮状态
-                registerBtn.innerHTML = originalText;
-                registerBtn.disabled = false;
-            }
-        }
-
-        async function logout() {
-            await supabase.auth.signOut();
-            showMessage('👋 已退出登录，期待再次相见！', 'info');
-        }
-
-        // ==================== 传送门功能 ====================
-        async function loadPortals() {
-            const portalsGrid = document.getElementById('portalsGrid');
-            portalsGrid.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>正在召唤传送门...</p>
-                </div>
-            `;
-
-            try {
-                const { data: portals, error, count } = await supabase
-                    .from('portals')
-                    .select('*', { count: 'exact' })
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                // 更新计数
-                document.getElementById('portalCount').textContent = `(${portals.length})`;
-
-                // 清空并重新填充
-                portalsGrid.innerHTML = '';
-
-                if (portals.length === 0) {
-                    portalsGrid.innerHTML = `
-                        <div class="portal-card" style="text-align: center; grid-column: 1 / -1;">
-                            <h3 class="portal-title">📭 暂无传送门</h3>
-                            <p class="portal-description">快来创建第一个魔法传送门吧！</p>
-                            <button class="btn" onclick="showAddPortalForm()">
-                                <i class="fas fa-plus-circle"></i> 创建第一个传送门
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // 渲染传送门卡片
-                portals.forEach(portal => {
-                    let show =false
-                    if (portal.who_can_see){
-                        if (portal.who_can_see == 'self'){
-                            if (currentUser) {
-                                if (currentUser.id === portal.created_by){
-                                    show = true
-                                }
-                            }
-                        }
-                    }else{
-                        show = true
-                    }
-                    if (show){
-                        let isCreator = false;
-                        if (currentUser) {
-                            if (currentUser.id === '4af1a89f-763f-4567-8695-f9d71f42630f') {
-                                isCreator = true;
-                            } else {
-                                isCreator = currentUser && portal.created_by === currentUser.id;
-                            }
-                        }
-
-                        const portalCard = document.createElement('div');
-                        portalCard.className = 'portal-card';
-                        portalCard.innerHTML = `
-                            <h3 class="portal-title">
-                                <i class="fas fa-door-open"></i> ${portal.title}
-                            </h3>
-                            <p class="portal-description">${portal.description || '暂无描述'}</p>
-                            <a href="${portal.url}" class="portal-url" target="_blank" rel="noopener">
-                                <i class="fas fa-external-link-alt"></i> ${portal.url}
-                            </a>
-                            
-                            ${portal.tags && portal.tags.length > 0 ? `
-                                <div class="portal-tags">
-                                    ${portal.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
-                                </div>
-                            ` : ''}
-                            
-                            <div class="portal-category">
-                                <i class="fas fa-tag"></i> ${portal.category || '未分类'}
-                            </div>
-                            
-                            <!-- 发布者信息 -->
-                            <div style="margin-top: 10px; font-size: 0.85rem; color: #a78bfa;">
-                                <i class="fas fa-user-circle"></i> 
-                                <span class="creator-info" title="创建时间: ${new Date(portal.created_at).toLocaleString()}">
-                                    发布者: ${portal.display_name || '神秘学徒'}
-                                </span>
-                            </div>
-                            
-                            <div style="margin-top: 15px; font-size: 0.85rem; color: #a78bfa;">
-                                <i class="far fa-eye"></i> ${portal.views_count || 0} 浏览 · 
-                                <i class="fas fa-mouse-pointer"></i> ${portal.clicks_count || 0} 点击
-                            </div>
-                            
-                            <!-- 删除按钮 -->
-                            ${isCreator ? `
-                                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(126, 105, 171, 0.3);">
-                                    <button class="btn-delete" onclick="deletePortal('${portal.id}', this)">
-                                        <i class="fas fa-trash-alt"></i> 删除传送门
-                                    </button>
-                                </div>
-                            ` : ''}
-                        `;
-
-                        // 点击卡片时增加点击计数（移动端优化）
-                        const urlLink = portalCard.querySelector('.portal-url');
-                        urlLink.addEventListener('click', async (e) => {
-                            e.preventDefault();
-                            try {
-                                await supabase.rpc('increment_portal_clicks', { portal_uuid: portal.id });
-                                // 延迟跳转，确保计数完成
-                                setTimeout(() => {
-                                    window.open(portal.url, '_blank');
-                                }, 100);
-                            } catch (error) {
-                                console.log('点击计数失败:', error);
-                                window.open(portal.url, '_blank');
-                            }
-                        });
-
-                        portalsGrid.appendChild(portalCard);
-                    }
-                });
-
-            } catch (error) {
-                portalsGrid.innerHTML = `
-                    <div class="portal-card" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444; grid-column: 1 / -1;">
-                        <h3 class="portal-title" style="color: #fca5a5;">
-                            <i class="fas fa-exclamation-triangle"></i> 加载失败
-                        </h3>
-                        <p class="portal-description">${error.message}</p>
-                        <button class="btn" onclick="loadPortals()">
-                            <i class="fas fa-redo"></i> 重新尝试
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        async function addPortal() {
-            const title = document.getElementById('portalTitle').value;
-            const url = document.getElementById('portalUrl').value;
-            const description = document.getElementById('portalDescription').value;
-            const category = document.getElementById('portalCategory').value;
-            const tagsInput = document.getElementById('portalTags').value;
-            const displayName = document.getElementById('portalDisplayName').value ||
-                (currentUser ? maskEmail(currentUser.email) : '神秘学徒');
-
-            if (!title || !url) {
-                showMessage('请填写网站名称和地址', 'error');
-                return;
-            }
-
-            // 显示加载状态
-            const addBtn = document.querySelector('#addPortalForm .btn');
-            const originalText = addBtn.innerHTML;
-            addBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 创建中...';
-            addBtn.disabled = true;
-
-            // 处理标签
-            const tags = tagsInput
-                ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag)
-                : [];
-
-            try {
-                const { data, error } = await supabase
-                    .from('portals')
-                    .insert([{
-                        title: title,
-                        url: url,
-                        description: description,
-                        category: category,
-                        tags: tags,
-                        display_name: displayName,
-                        created_by: currentUser.id,  // ★★★ 新增：保存用户ID ★★★
-                    }])
-                    .select();
-
-                if (error) throw error;
-
-                showMessage(`✨ 传送门 "${title}" 创建成功！`, 'success');
-                hideAddPortalForm();
-
-                // 清空表单
-                document.getElementById('portalTitle').value = '';
-                document.getElementById('portalUrl').value = '';
-                document.getElementById('portalDescription').value = '';
-                document.getElementById('portalTags').value = '';
-                document.getElementById('portalDisplayName').value = '';
-
-                // 重新加载传送门列表
-                loadPortals();
-
-            } catch (error) {
-                showMessage(`创建失败: ${error.message}`, 'error');
-            } finally {
-                // 恢复按钮状态
-                addBtn.innerHTML = originalText;
-                addBtn.disabled = false;
-            }
-        }
-
-        // ==================== 删除传送门功能 ====================
-        function deletePortal(portalId, buttonElement) {
-            if (!currentUser) {
-                showMessage('请先登录才能删除传送门', 'error');
-                return;
-            }
-
-            // 保存要删除的传送门ID和按钮元素
-            deletePortalId = portalId;
-            deleteButtonElement = buttonElement;
-
-            // 查找传送门标题用于显示
-            const portalCard = buttonElement.closest('.portal-card');
-            const portalTitle = portalCard.querySelector('.portal-title').textContent.trim();
-
-            // 更新确认消息
-            document.getElementById('deleteConfirmMessage').innerHTML =
-                `确定要删除传送门<br><strong>"${portalTitle}"</strong><br>吗？此操作不可撤销。`;
-
-            // 显示确认对话框
-            document.getElementById('deleteConfirmDialog').classList.add('active');
-        }
-
-        function confirmDelete() {
-            if (!deletePortalId) return;
-
-            // 禁用按钮显示加载状态
-            const confirmBtn = document.querySelector('.btn-confirm');
-            const originalText = confirmBtn.innerHTML;
-            confirmBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 删除中...';
-            confirmBtn.disabled = true;
-
-            // 执行删除
-            supabase
-                .from('portals')
-                .delete()
-                .eq('id', deletePortalId)
-                .then(async ({ error }) => {
-                    if (error) {
-                        showMessage(`删除失败: ${error.message}`, 'error');
-                    } else {
-                        showMessage('✅ 传送门已成功删除', 'success');
-
-                        // 从界面移除卡片
-                        if (deleteButtonElement) {
-                            const portalCard = deleteButtonElement.closest('.portal-card');
-                            portalCard.style.animation = 'fadeOut 0.5s ease';
-                            setTimeout(() => {
-                                portalCard.remove();
-                                updatePortalCount();
-                            }, 500);
-                        }
-
-                        // 重新加载列表
-                        setTimeout(loadPortals, 1000);
-                    }
-
-                    // 隐藏对话框
-                    cancelDelete();
-                })
-                .catch(error => {
-                    showMessage(`删除失败: ${error.message}`, 'error');
-                    cancelDelete();
-                });
-        }
-
-        function cancelDelete() {
-            document.getElementById('deleteConfirmDialog').classList.remove('active');
-            deletePortalId = null;
-            deleteButtonElement = null;
-
-            // 重置确认按钮
-            const confirmBtn = document.querySelector('.btn-confirm');
-            confirmBtn.innerHTML = '<i class="fas fa-trash-alt"></i> 确认删除';
-            confirmBtn.disabled = false;
-        }
-
-        // 更新传送门计数
-        function updatePortalCount() {
-            const portalCards = document.querySelectorAll('.portal-card');
-            const count = portalCards.length;
-            document.getElementById('portalCount').textContent = `(${count})`;
-        }
-
-        // ==================== 页面加载 ====================
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // 添加事件监听器
-            document.getElementById('authBtn')?.addEventListener('click', showAuthForm);
-            document.getElementById('refreshBtn')?.addEventListener('click', loadPortals);
-            document.getElementById('searchBtn')?.addEventListener('click', function () {
-                showMessage('功能开发中...', 'info');
-            });
-            document.getElementById('addPortalBtn')?.addEventListener('click', showAddPortalForm);
-
-            // 添加移动端触摸事件优化
-            document.querySelectorAll('button, .btn, .auth-tab').forEach(element => {
-                element.addEventListener('touchstart', function () {
-                    this.classList.add('active');
-                });
-                element.addEventListener('touchend', function () {
-                    this.classList.remove('active');
-                });
-            });
-
-            // 初始化应用
-            init();
-        });
-
-        // 点击表单外部关闭表单
-        document.querySelectorAll('.form-overlay').forEach(overlay => {
-            overlay.addEventListener('click', function (e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
-        });
-    </script>
+	<!-- 头部 -->
+	<div class="header">
+		<div class="logo">🔮</div>
+		<h1 class="title">魔术师的传送门</h1>
+		<p class="subtitle">连接神秘世界的门户，分享你的魔法收藏</p>
+	</div>
+
+	<div class="container">
+		<!-- 用户面板 -->
+		<div class="user-panel" id="userPanel">
+			<div class="user-info">
+				<h3><i class="fas fa-hat-wizard"></i> 欢迎，魔法学徒！</h3>
+				<div class="user-details" id="userDetails">
+					<!-- 用户信息动态填充 -->
+				</div>
+				<button class="btn btn-danger" onclick="logout()">
+					<i class="fas fa-sign-out-alt"></i> 退出登录
+				</button>
+			</div>
+		</div>
+
+		<!-- 控制按钮 -->
+		<div class="controls">
+			<button class="btn" id="authBtn">
+				<i class="fas fa-hat-wizard"></i> 登录/注册
+			</button>
+			<button class="btn" id="addPortalBtn" style="display: flex;">
+				<i class="fas fa-plus-circle"></i>记录传送门
+			</button>
+			<button class="btn btn-secondary" id="refreshBtn">
+				<i class="fas fa-sync-alt"></i> 刷新传送门
+			</button>
+			<button class="btn btn-secondary" id="searchBtn">
+				<i class="fas fa-search"></i> 搜索传送门
+			</button>
+			<div class="form-group">
+				<label class="form-label">选择传送门可见人</label>
+				<div class="select-wrapper">
+					<select class="form-input" id="selectWhocansee">
+						<option value=null>所有人</option>
+						<option value="self">仅自己</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<!-- 消息提示 -->
+		<div class="message" id="message"></div>
+
+		<!-- 传送门列表 -->
+		<div class="portals-container">
+			<h2 class="section-title">
+				<i class="fas fa-door-open"></i> 魔法传送门
+				<span class="portal-count" id="portalCount">(0)</span>
+			</h2>
+
+			<div class="portals-grid" id="portalsGrid">
+				<!-- 传送门卡片动态填充 -->
+				<div class="loading">
+					<div class="spinner"></div>
+					<p>正在召唤传送门...</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- 页脚 -->
+		<div class="footer">
+			<p>🔮 魔术师的传送门 | 用魔法连接世界</p>
+			<p>Powered by <a href="https://supabase.com" target="_blank">Supabase</a></p>
+		</div>
+	</div>
+
+	<!-- 登录/注册表单 -->
+	<div class="form-overlay" id="authForm">
+		<div class="form-container">
+			<h2 class="form-title">🔐 进入神秘世界</h2>
+
+			<div class="auth-tabs">
+				<div class="auth-tab active" onclick="switchAuthTab('login')">登录</div>
+				<div class="auth-tab" onclick="switchAuthTab('register')">注册</div>
+			</div>
+
+			<!-- 登录表单 -->
+			<div class="auth-form active" id="loginForm">
+				<div class="form-group">
+					<label class="form-label">邮箱</label>
+					<input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"
+						inputmode="email">
+				</div>
+				<div class="form-group">
+					<label class="form-label">密码</label>
+					<input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
+				</div>
+				<div class="form-actions">
+					<button class="btn" onclick="login()">
+						<i class="fas fa-sign-in-alt"></i> 进入神秘世界
+					</button>
+					<button class="btn btn-secondary" onclick="hideAuthForm()">
+						取消
+					</button>
+				</div>
+			</div>
+
+			<!-- 注册表单 -->
+			<div class="auth-form" id="registerForm">
+				<div class="form-group">
+					<label class="form-label">邮箱</label>
+					<input type="email" class="form-input" id="registerEmail" placeholder="your@email.com"
+						inputmode="email">
+				</div>
+				<div class="form-group">
+					<label class="form-label">密码 (最少6位)</label>
+					<input type="password" class="form-input" id="registerPassword" placeholder="••••••••">
+				</div>
+				<div class="form-group">
+					<label class="form-label">确认密码</label>
+					<input type="password" class="form-input" id="registerConfirmPassword" placeholder="••••••••">
+				</div>
+				<div class="form-actions">
+					<button class="btn" onclick="register()">
+						<i class="fas fa-user-plus"></i> 成为魔法学徒
+					</button>
+					<button class="btn btn-secondary" onclick="hideAuthForm()">
+						取消
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 添加传送门表单 -->
+	<div class="form-overlay" id="addPortalForm">
+		<div class="form-container">
+			<h2 class="form-title">✨ 创建新传送门</h2>
+
+			<div class="form-group">
+				<label class="form-label">网站名称</label>
+				<input type="text" class="form-input" id="portalTitle" placeholder="例如：我的世界 Wiki">
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">网站地址 (URL)</label>
+				<input type="url" class="form-input" id="portalUrl" placeholder="https://example.com" inputmode="url">
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">网站描述</label>
+				<textarea class="form-input form-textarea" id="portalDescription"
+					placeholder="描述这个网站的神奇之处..."></textarea>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">分类</label>
+				<div class="select-wrapper">
+					<select class="form-input" id="portalCategory">
+						<option value="魔法">🔮 魔法</option>
+						<option value="有趣">✨ 有趣</option>
+						<option value="塔罗牌">🃏 塔罗牌</option>
+						<option value="工具">⚗️ 工具</option>
+						<option value="视频">📖 视频</option>
+						<option value="小说">📚 小说</option>
+						<option value="游戏">🎮 游戏</option>
+						<option value="技术">💻 技术</option>
+						<option value="其他">🌀 其他</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">发布者名称</label>
+				<input type="text" class="form-input" id="portalDisplayName" placeholder="例如：神秘学徒等" maxlength="20">
+				<small style="color: var(--purple-medium); font-size: 0.85rem;">
+					这是别人看到的你的名称（可选，默认显示邮箱）
+				</small>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">标签 (用逗号分隔)</label>
+				<input type="text" class="form-input" id="portalTags" placeholder="例如：魔法, 小说, 游戏">
+			</div>
+			
+			<div class="form-group">
+				<label class="form-label">可见人</label>
+				<div class="select-wrapper">
+					<select class="form-input" id="portalWhocansee">
+						<option value=null>所有人</option>
+						<option value="self">仅自己</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-actions">
+				<button class="btn" onclick="addPortal()">
+					<i class="fas fa-magic"></i> 记录魔法
+				</button>
+				<button class="btn btn-secondary" onclick="hideAddPortalForm()">
+					取消
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 删除确认对话框 -->
+	<div class="confirm-dialog" id="deleteConfirmDialog">
+		<div class="confirm-box">
+			<h3 class="confirm-title"><i class="fas fa-exclamation-triangle"></i> 确认删除</h3>
+			<p class="confirm-message" id="deleteConfirmMessage">
+				确定要删除这个传送门吗？此操作不可撤销。
+			</p>
+			<div class="confirm-actions">
+				<button class="btn-confirm" onclick="confirmDelete()">
+					<i class="fas fa-trash-alt"></i> 确认删除
+				</button>
+				<button class="btn-cancel" onclick="cancelDelete()">
+					<i class="fas fa-times"></i> 取消
+				</button>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 添加FastClick解决移动端点击延迟 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+
+	<!-- 引入 Supabase -->
+	<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+	<script>
+		// ==================== 配置 ====================
+		const SUPABASE_URL = 'https://plakgkehqlopwfrsceem.supabase.co';
+		const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWtna2VocWxvcHdmcnNjZWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NzQyMzQsImV4cCI6MjA4MTE1MDIzNH0.HjlawMHv356F_NaxRagTYR7Q96UnCfAfFLie6XRk1Jg';
+
+		// ==================== 全局变量 ====================
+		
+		//let supabase = null;
+		let currentUser = null;
+		let deletePortalId = null;
+		let deleteButtonElement = null;
+		
+		// ==================== 初始化vConsole ====================
+		var vConsole = new VConsole();
+
+		// ==================== 移动端优化函数 ====================
+		function preventZoom(event) {
+			if (event.touches.length > 1) {
+				event.preventDefault();
+			}
+		}
+
+		// 禁止双指缩放
+		document.addEventListener('touchstart', preventZoom, { passive: false });
+
+		// 修复移动端点击延迟
+		if ('addEventListener' in document) {
+			document.addEventListener('DOMContentLoaded', function () {
+				FastClick.attach(document.body);
+			}, false);
+		}
+
+		// ==================== 初始化 ====================
+		async function init() {
+			try {
+				// 创建 Supabase 客户端
+				if (!window.supabaseClient) {
+					window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+						auth: {
+							persistSession: true,
+							autoRefreshToken: true
+						}
+					});
+				}
+				supabase = window.supabaseClient;
+
+				// 设置认证状态监听
+				supabase.auth.onAuthStateChange((event, session) => {
+					if (event === 'SIGNED_IN' && session) {
+						currentUser = session.user;
+						updateUserPanel();
+						showMessage(`🎉 欢迎回来，${currentUser.email}！`, 'success');
+					} else if (event === 'SIGNED_OUT') {
+						currentUser = null;
+						updateUserPanel();
+					}
+				});
+
+				// 检查当前会话
+				const { data: { session } } = await supabase.auth.getSession();
+				if (session) {
+					currentUser = session.user;
+					updateUserPanel();
+				}
+
+				// 加载传送门
+				loadPortals();
+
+			} catch (error) {
+				showMessage(`初始化失败: ${error.message}`, 'error');
+			}
+		}
+
+		// ==================== 用户界面函数 ====================
+		function updateUserPanel() {
+			const userPanel = document.getElementById('userPanel');
+			const addPortalBtn = document.getElementById('addPortalBtn');
+			const userDetails = document.getElementById('userDetails');
+
+			if (currentUser) {
+				userPanel.classList.add('active');
+				//addPortalBtn.style.display = 'flex';
+
+				userDetails.innerHTML = `
+					<p><strong>🔮 学徒邮箱:</strong> ${currentUser.email}</p>
+					<p><strong>🎫 用户ID:</strong> ${currentUser.id.substring(0, 12)}...</p>
+					<p><strong>⏰ 注册时间:</strong> ${new Date(currentUser.created_at).toLocaleString()}</p>
+				`;
+			} else {
+				userPanel.classList.remove('active');
+				//addPortalBtn.style.display = 'none';
+			}
+		}
+
+		// ==================== 表单控制 ====================
+		function showAuthForm() {
+			document.getElementById('authForm').classList.add('active');
+			// 滚动到顶部
+			document.querySelector('.form-overlay').scrollTop = 0;
+		}
+
+		function hideAuthForm() {
+			document.getElementById('authForm').classList.remove('active');
+		}
+
+		function switchAuthTab(tab) {
+			// 更新标签
+			document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+			document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+
+			if (tab === 'login') {
+				document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+				document.getElementById('loginForm').classList.add('active');
+			} else {
+				document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+				document.getElementById('registerForm').classList.add('active');
+			}
+		}
+
+		function showAddPortalForm() {
+			if (!currentUser) {
+				showMessage('请先登录才能添加传送门', 'error');
+				return;
+			}
+			document.getElementById('addPortalForm').classList.add('active');
+			// 滚动到顶部
+			document.querySelector('.form-overlay').scrollTop = 0;
+		}
+
+		function hideAddPortalForm() {
+			document.getElementById('addPortalForm').classList.remove('active');
+		}
+
+		// ==================== 消息提示 ====================
+		function showMessage(text, type = 'info') {
+			const messageDiv = document.getElementById('message');
+			messageDiv.textContent = text;
+			messageDiv.className = `message ${type} show`;
+
+			setTimeout(() => {
+				messageDiv.classList.remove('show');
+			}, 5000);
+		}
+
+		// ==================== 邮箱脱敏函数 ====================
+		function maskEmail(email) {
+			if (!email || typeof email !== 'string') return '神秘学徒';
+
+			const [name, domain] = email.split('@');
+			if (!name || !domain) return email;
+
+			if (name.length <= 2) {
+				return `${name.charAt(0)}***@${domain}`;
+			}
+			return `${name.charAt(0)}***${name.charAt(name.length - 1)}@${domain}`;
+		}
+
+		// ==================== 认证功能 ====================
+		async function login() {
+			const email = document.getElementById('loginEmail').value;
+			const password = document.getElementById('loginPassword').value;
+
+			if (!email || !password) {
+				showMessage('请输入邮箱和密码', 'error');
+				return;
+			}
+
+			// 显示加载状态
+			const loginBtn = document.querySelector('#loginForm .btn');
+			const originalText = loginBtn.innerHTML;
+			loginBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 登录中...';
+			loginBtn.disabled = true;
+
+			try {
+				const { data, error } = await supabase.auth.signInWithPassword({
+					email: email,
+					password: password
+				});
+
+				if (error) throw error;
+
+				showMessage(`🔮 欢迎进入神秘世界！`, 'success');
+				hideAuthForm();
+				loadPortals();
+
+			} catch (error) {
+				showMessage(`登录失败: ${error.message}`, 'error');
+			} finally {
+				// 恢复按钮状态
+				loginBtn.innerHTML = originalText;
+				loginBtn.disabled = false;
+			}
+		}
+
+		async function register() {
+			const email = document.getElementById('registerEmail').value;
+			const password = document.getElementById('registerPassword').value;
+			const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+			if (!email || !password) {
+				showMessage('请输入邮箱和密码', 'error');
+				return;
+			}
+
+			if (password.length < 6) {
+				showMessage('密码至少需要6位', 'error');
+				return;
+			}
+
+			if (password !== confirmPassword) {
+				showMessage('两次输入的密码不一致', 'error');
+				return;
+			}
+
+			// 显示加载状态
+			const registerBtn = document.querySelector('#registerForm .btn');
+			const originalText = registerBtn.innerHTML;
+			registerBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 注册中...';
+			registerBtn.disabled = true;
+
+			try {
+				const { data, error } = await supabase.auth.signUp({
+					email: email,
+					password: password
+				});
+
+				if (error) {
+					// 如果用户已存在，尝试登录
+					if (error.message.includes('already registered')) {
+						showMessage('用户已存在，尝试登录...', 'info');
+						await login();
+						return;
+					}
+					throw error;
+				}
+
+				showMessage(`✨ 注册成功！欢迎新的魔法学徒！`, 'success');
+				hideAuthForm();
+
+				// 如果注册后自动登录了
+				if (data.session) {
+					currentUser = data.user;
+					updateUserPanel();
+				}
+
+			} catch (error) {
+				showMessage(`注册失败: ${error.message}`, 'error');
+			} finally {
+				// 恢复按钮状态
+				registerBtn.innerHTML = originalText;
+				registerBtn.disabled = false;
+			}
+		}
+
+		async function logout() {
+			await supabase.auth.signOut();
+			showMessage('👋 已退出登录，期待再次相见！', 'info');
+		}
+
+		// ==================== 传送门功能 ====================
+		async function loadPortals() {
+			const portalsGrid = document.getElementById('portalsGrid');
+			portalsGrid.innerHTML = `
+				<div class="loading">
+					<div class="spinner"></div>
+					<p>正在召唤传送门...</p>
+				</div>
+			`;
+
+			try {
+				const { data: portals, error, count } = await supabase
+					.from('portals')
+					.select('*', { count: 'exact' })
+					.order('created_at', { ascending: false });
+
+				if (error) throw error;
+
+				// 更新计数
+				document.getElementById('portalCount').textContent = `(${portals.length})`;
+
+				// 清空并重新填充
+				portalsGrid.innerHTML = '';
+
+				if (portals.length === 0) {
+					portalsGrid.innerHTML = `
+						<div class="portal-card" style="text-align: center; grid-column: 1 / -1;">
+							<h3 class="portal-title">📭 暂无传送门</h3>
+							<p class="portal-description">快来创建第一个魔法传送门吧！</p>
+							<button class="btn" onclick="showAddPortalForm()">
+								<i class="fas fa-plus-circle"></i> 创建第一个传送门
+							</button>
+						</div>
+					`;
+					return;
+				}
+
+				// 渲染传送门卡片
+				portals.forEach(portal => {
+					let show = false;
+					if (portal.who_can_see && portal.who_can_see =='self' && currentUser && currentUser.id === portal.created_by){
+						show = true;
+					}else if (!portal.who_can_see){
+						show = true
+					}
+					if (show){
+						let isCreator = false;
+						if (currentUser) {
+							if (currentUser.id === '4af1a89f-763f-4567-8695-f9d71f42630f') {
+								isCreator = true;
+							} else {
+								isCreator = currentUser && portal.created_by === currentUser.id;
+							}
+						}
+
+						const portalCard = document.createElement('div');
+						portalCard.className = 'portal-card';
+						portalCard.innerHTML = `
+							<h3 class="portal-title">
+								<i class="fas fa-door-open"></i> ${portal.title}
+							</h3>
+							<p class="portal-description">${portal.description || '暂无描述'}</p>
+							<a href="${portal.url}" class="portal-url" target="_blank" rel="noopener">
+								<i class="fas fa-external-link-alt"></i> ${portal.url}
+							</a>
+							
+							${portal.tags && portal.tags.length > 0 ? `
+								<div class="portal-tags">
+									${portal.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+								</div>
+							` : ''}
+							
+							<div class="portal-category">
+								<i class="fas fa-tag"></i> ${portal.category || '未分类'}
+							</div>
+							
+							<!-- 发布者信息 -->
+							<div style="margin-top: 10px; font-size: 0.85rem; color: #a78bfa;">
+								<i class="fas fa-user-circle"></i> 
+								<span class="creator-info" title="创建时间: ${new Date(portal.created_at).toLocaleString()}">
+									发布者: ${portal.display_name || '神秘学徒'}
+								</span>
+							</div>
+							
+							<div style="margin-top: 15px; font-size: 0.85rem; color: #a78bfa;">
+								<i class="far fa-eye"></i> ${portal.views_count || 0} 浏览 · 
+								<i class="fas fa-mouse-pointer"></i> ${portal.clicks_count || 0} 点击
+							</div>
+							
+							<!-- 删除按钮 -->
+							${isCreator ? `
+								<div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(126, 105, 171, 0.3);">
+									<button class="btn-delete" onclick="deletePortal('${portal.id}', this)">
+										<i class="fas fa-trash-alt"></i> 删除传送门
+									</button>
+								</div>
+							` : ''}
+						`;
+
+						// 点击卡片时增加点击计数（移动端优化）
+						const urlLink = portalCard.querySelector('.portal-url');
+						urlLink.addEventListener('click', async (e) => {
+							e.preventDefault();
+							try {
+								await supabase.rpc('increment_portal_clicks', { portal_uuid: portal.id });
+								// 延迟跳转，确保计数完成
+								setTimeout(() => {
+									window.open(portal.url, '_blank');
+								}, 100);
+							} catch (error) {
+								console.log('点击计数失败:', error);
+								window.open(portal.url, '_blank');
+							}
+						});
+
+						portalsGrid.appendChild(portalCard);
+					}
+				});
+
+			} catch (error) {
+				portalsGrid.innerHTML = `
+					<div class="portal-card" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444; grid-column: 1 / -1;">
+						<h3 class="portal-title" style="color: #fca5a5;">
+							<i class="fas fa-exclamation-triangle"></i> 加载失败
+						</h3>
+						<p class="portal-description">${error.message}</p>
+						<button class="btn" onclick="loadPortals()">
+							<i class="fas fa-redo"></i> 重新尝试
+						</button>
+					</div>
+				`;
+			}
+		}
+
+		async function addPortal() {
+			const title = document.getElementById('portalTitle').value;
+			const url = document.getElementById('portalUrl').value;
+			const description = document.getElementById('portalDescription').value;
+			const category = document.getElementById('portalCategory').value;
+			const tagsInput = document.getElementById('portalTags').value;
+			const displayName = document.getElementById('portalDisplayName').value ||
+				(currentUser ? maskEmail(currentUser.email) : '神秘学徒');
+			const who_can_see = document.getElementById('poportalWhocansee').value;
+
+			if (!title || !url) {
+				showMessage('请填写网站名称和地址', 'error');
+				return;
+			}
+
+			// 显示加载状态
+			const addBtn = document.querySelector('#addPortalForm .btn');
+			const originalText = addBtn.innerHTML;
+			addBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 创建中...';
+			addBtn.disabled = true;
+
+			// 处理标签
+			const tags = tagsInput
+				? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag)
+				: [];
+
+			try {
+				const { data, error } = await supabase
+					.from('portals')
+					.insert([{
+						title: title,
+						url: url,
+						description: description,
+						category: category,
+						tags: tags,
+						display_name: displayName,
+						created_by: currentUser.id,  // ★★★ 新增：保存用户ID ★★★
+						who_can_see: who_can_see,
+					}])
+					.select();
+
+				if (error) throw error;
+
+				showMessage(`✨ 传送门 "${title}" 创建成功！`, 'success');
+				hideAddPortalForm();
+
+				// 清空表单
+				document.getElementById('portalTitle').value = '';
+				document.getElementById('portalUrl').value = '';
+				document.getElementById('portalDescription').value = '';
+				document.getElementById('portalTags').value = '';
+				document.getElementById('portalDisplayName').value = '';
+
+				// 重新加载传送门列表
+				loadPortals();
+
+			} catch (error) {
+				showMessage(`创建失败: ${error.message}`, 'error');
+			} finally {
+				// 恢复按钮状态
+				addBtn.innerHTML = originalText;
+				addBtn.disabled = false;
+			}
+		}
+
+		// ==================== 删除传送门功能 ====================
+		function deletePortal(portalId, buttonElement) {
+			if (!currentUser) {
+				showMessage('请先登录才能删除传送门', 'error');
+				return;
+			}
+
+			// 保存要删除的传送门ID和按钮元素
+			deletePortalId = portalId;
+			deleteButtonElement = buttonElement;
+
+			// 查找传送门标题用于显示
+			const portalCard = buttonElement.closest('.portal-card');
+			const portalTitle = portalCard.querySelector('.portal-title').textContent.trim();
+
+			// 更新确认消息
+			document.getElementById('deleteConfirmMessage').innerHTML =
+				`确定要删除传送门<br><strong>"${portalTitle}"</strong><br>吗？此操作不可撤销。`;
+
+			// 显示确认对话框
+			document.getElementById('deleteConfirmDialog').classList.add('active');
+		}
+
+		function confirmDelete() {
+			if (!deletePortalId) return;
+
+			// 禁用按钮显示加载状态
+			const confirmBtn = document.querySelector('.btn-confirm');
+			const originalText = confirmBtn.innerHTML;
+			confirmBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; display: inline-block; margin-right: 8px;"></div> 删除中...';
+			confirmBtn.disabled = true;
+
+			// 执行删除
+			supabase
+				.from('portals')
+				.delete()
+				.eq('id', deletePortalId)
+				.then(async ({ error }) => {
+					if (error) {
+						showMessage(`删除失败: ${error.message}`, 'error');
+					} else {
+						showMessage('✅ 传送门已成功删除', 'success');
+
+						// 从界面移除卡片
+						if (deleteButtonElement) {
+							const portalCard = deleteButtonElement.closest('.portal-card');
+							portalCard.style.animation = 'fadeOut 0.5s ease';
+							setTimeout(() => {
+								portalCard.remove();
+								updatePortalCount();
+							}, 500);
+						}
+
+						// 重新加载列表
+						setTimeout(loadPortals, 1000);
+					}
+
+					// 隐藏对话框
+					cancelDelete();
+				})
+				.catch(error => {
+					showMessage(`删除失败: ${error.message}`, 'error');
+					cancelDelete();
+				});
+		}
+
+		function cancelDelete() {
+			document.getElementById('deleteConfirmDialog').classList.remove('active');
+			deletePortalId = null;
+			deleteButtonElement = null;
+
+			// 重置确认按钮
+			const confirmBtn = document.querySelector('.btn-confirm');
+			confirmBtn.innerHTML = '<i class="fas fa-trash-alt"></i> 确认删除';
+			confirmBtn.disabled = false;
+		}
+
+		// 更新传送门计数
+		function updatePortalCount() {
+			const portalCards = document.querySelectorAll('.portal-card');
+			const count = portalCards.length;
+			document.getElementById('portalCount').textContent = `(${count})`;
+		}
+
+		// ==================== 页面加载 ====================
+		document.addEventListener('DOMContentLoaded', function () {
+
+			// 添加事件监听器
+			document.getElementById('authBtn')?.addEventListener('click', showAuthForm);
+			document.getElementById('refreshBtn')?.addEventListener('click', loadPortals);
+			document.getElementById('searchBtn')?.addEventListener('click', function () {
+				showMessage('功能开发中...', 'info');
+			});
+			document.getElementById('addPortalBtn')?.addEventListener('click', showAddPortalForm);
+
+			// 添加移动端触摸事件优化
+			document.querySelectorAll('button, .btn, .auth-tab').forEach(element => {
+				element.addEventListener('touchstart', function () {
+					this.classList.add('active');
+				});
+				element.addEventListener('touchend', function () {
+					this.classList.remove('active');
+				});
+			});
+
+			// 初始化应用
+			init();
+		});
+
+		// 点击表单外部关闭表单
+		document.querySelectorAll('.form-overlay').forEach(overlay => {
+			overlay.addEventListener('click', function (e) {
+				if (e.target === this) {
+					this.classList.remove('active');
+				}
+			});
+		});
+		
+	</script>
 </body>
 
 </html>
